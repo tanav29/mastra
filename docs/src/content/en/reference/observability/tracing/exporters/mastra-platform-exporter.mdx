@@ -21,7 +21,7 @@ Sends tracing spans, logs, metrics, scores, and feedback to the Mastra platform 
 
 ## Span previews
 
-`MastraPlatformExporter` automatically generates short, readable `inputPreview`, `outputPreview`, and `errorPreview` summaries based on the span type. Each preview contains up to 100 characters plus an ellipsis when truncated. Full payloads remain available separately.
+`MastraPlatformExporter` automatically generates short, readable `inputPreview`, `outputPreview`, and `errorPreview` summaries based on the span type. Each preview contains up to 100 characters plus an ellipsis when truncated. Processor spans retain their previews and step details. By default, the exporter omits repeated message lists, system messages, and LLM request prompts from processor inputs. Set `includeProcessorHistory: true` to upload those fields for debugging.
 
 ## Constructor
 
@@ -44,6 +44,8 @@ new MastraPlatformExporter(config?: MastraPlatformExporterConfig)
 
 ```typescript
 interface MastraPlatformExporterConfig extends BaseExporterConfig {
+  includeProcessorHistory?: boolean // Default: false
+
   /** Maximum number of buffered events per batch (spans, logs, metrics, scores, feedback). Default: 1000 */
   maxBatchSize?: number
 
