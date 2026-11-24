@@ -24,6 +24,7 @@ import type {
 } from '@mastra/core/storage/domains/prompt-blocks';
 import { schemaNamePrefix } from '../../../shared/schema-name';
 import { PgDB, resolvePgConfig, generateTableSQL, generateIndexSQL } from '../../db';
+import { defaultIndexName } from '../../db/constraint-utils';
 import type { DbClient, PgDomainConfig } from '../../db';
 import { toPgJson } from '../../db/sanitize-json';
 import { getTableName, getSchemaName, parseJsonResilient } from '../utils';
@@ -54,7 +55,7 @@ export class PromptBlocksPG extends PromptBlocksStorage {
   static getDefaultIndexDefs(schemaPrefix: string): CreateIndexOptions[] {
     return [
       {
-        name: `${schemaPrefix}idx_prompt_block_versions_block_version`,
+        name: defaultIndexName(`${schemaPrefix}idx_prompt_block_versions_block_version`),
         table: TABLE_PROMPT_BLOCK_VERSIONS,
         columns: ['blockId', 'versionNumber'],
         unique: true,

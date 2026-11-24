@@ -26,6 +26,7 @@ import { parseSqlIdentifier } from '@mastra/core/utils';
 
 import { schemaNamePrefix } from '../../../shared/schema-name';
 import { PgDB, resolvePgConfig, generateTableSQL, generateIndexSQL } from '../../db';
+import { defaultIndexName } from '../../db/constraint-utils';
 import type { DbClient, PgDomainConfig } from '../../db';
 import { toPgJson } from '../../db/sanitize-json';
 import { runPrune, resolveTargets } from '../../retention';
@@ -261,17 +262,17 @@ export class NotificationsPG extends NotificationsStorage {
   static getDefaultIndexDefs(schemaPrefix: string): CreateIndexOptions[] {
     return [
       {
-        name: `${schemaPrefix}idx_notifications_thread_status_updated`,
+        name: defaultIndexName(`${schemaPrefix}idx_notifications_thread_status_updated`),
         table: TABLE_NOTIFICATIONS,
         columns: ['threadId', 'status', 'updatedAt'],
       },
       {
-        name: `${schemaPrefix}idx_notifications_coalescing`,
+        name: defaultIndexName(`${schemaPrefix}idx_notifications_coalescing`),
         table: TABLE_NOTIFICATIONS,
         columns: ['threadId', 'source', 'kind', 'status', 'agentId', 'resourceId', 'dedupeKey', 'coalesceKey'],
       },
       {
-        name: `${schemaPrefix}idx_notifications_due`,
+        name: defaultIndexName(`${schemaPrefix}idx_notifications_due`),
         table: TABLE_NOTIFICATIONS,
         columns: ['status', 'deliverAt', 'summaryAt'],
       },

@@ -17,6 +17,7 @@ import type {
 
 import { schemaNamePrefix } from '../../../shared/schema-name';
 import { PgDB, resolvePgConfig, generateTableSQL, generateIndexSQL } from '../../db';
+import { defaultIndexName } from '../../db/constraint-utils';
 import type { PgDomainConfig } from '../../db';
 import { getTableName, getSchemaName } from '../utils';
 
@@ -72,7 +73,7 @@ export class ToolProviderConnectionsPG extends ToolProviderConnectionsStorage {
   static getDefaultIndexDefs(schemaPrefix: string): CreateIndexOptions[] {
     return [
       {
-        name: `${schemaPrefix}idx_tool_provider_connections_author`,
+        name: defaultIndexName(`${schemaPrefix}idx_tool_provider_connections_author`),
         table: TABLE_TOOL_PROVIDER_CONNECTIONS,
         columns: ['authorId', 'providerId', 'toolkit'],
       },

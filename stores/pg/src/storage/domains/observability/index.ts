@@ -36,6 +36,7 @@ import type {
 } from '@mastra/core/storage';
 import { schemaNamePrefix } from '../../../shared/schema-name';
 import { PgDB, resolvePgConfig, generateTableSQL, generateIndexSQL, generateTimestampTriggerSQL } from '../../db';
+import { defaultIndexName } from '../../db/constraint-utils';
 import type { PgDomainConfig } from '../../db';
 import { toPgJson } from '../../db/sanitize-json';
 import { runPrune, resolveTargets } from '../../retention';
@@ -113,59 +114,59 @@ export class ObservabilityPG extends ObservabilityStorage {
   static getDefaultIndexDefs(schemaPrefix: string): CreateIndexOptions[] {
     return [
       {
-        name: `${schemaPrefix}mastra_ai_spans_traceid_startedat_idx`,
+        name: defaultIndexName(`${schemaPrefix}mastra_ai_spans_traceid_startedat_idx`),
         table: TABLE_SPANS,
         columns: ['traceId', 'startedAt DESC'],
       },
       {
-        name: `${schemaPrefix}mastra_ai_spans_parentspanid_startedat_idx`,
+        name: defaultIndexName(`${schemaPrefix}mastra_ai_spans_parentspanid_startedat_idx`),
         table: TABLE_SPANS,
         columns: ['parentSpanId', 'startedAt DESC'],
       },
       {
-        name: `${schemaPrefix}mastra_ai_spans_name_idx`,
+        name: defaultIndexName(`${schemaPrefix}mastra_ai_spans_name_idx`),
         table: TABLE_SPANS,
         columns: ['name'],
       },
       {
-        name: `${schemaPrefix}mastra_ai_spans_spantype_startedat_idx`,
+        name: defaultIndexName(`${schemaPrefix}mastra_ai_spans_spantype_startedat_idx`),
         table: TABLE_SPANS,
         columns: ['spanType', 'startedAt DESC'],
       },
       // Root spans partial index - every listTraces query filters parentSpanId IS NULL
       {
-        name: `${schemaPrefix}mastra_ai_spans_root_spans_idx`,
+        name: defaultIndexName(`${schemaPrefix}mastra_ai_spans_root_spans_idx`),
         table: TABLE_SPANS,
         columns: ['startedAt DESC'],
         where: '"parentSpanId" IS NULL',
       },
       // Entity identification indexes - common filtering patterns
       {
-        name: `${schemaPrefix}mastra_ai_spans_entitytype_entityid_idx`,
+        name: defaultIndexName(`${schemaPrefix}mastra_ai_spans_entitytype_entityid_idx`),
         table: TABLE_SPANS,
         columns: ['entityType', 'entityId'],
       },
       {
-        name: `${schemaPrefix}mastra_ai_spans_entitytype_entityname_idx`,
+        name: defaultIndexName(`${schemaPrefix}mastra_ai_spans_entitytype_entityname_idx`),
         table: TABLE_SPANS,
         columns: ['entityType', 'entityName'],
       },
       // Multi-tenant filtering - organizationId + userId
       {
-        name: `${schemaPrefix}mastra_ai_spans_orgid_userid_idx`,
+        name: defaultIndexName(`${schemaPrefix}mastra_ai_spans_orgid_userid_idx`),
         table: TABLE_SPANS,
         columns: ['organizationId', 'userId'],
       },
       // Metadata JSONB GIN index - for custom filtering with @> containment
       {
-        name: `${schemaPrefix}mastra_ai_spans_metadata_gin_idx`,
+        name: defaultIndexName(`${schemaPrefix}mastra_ai_spans_metadata_gin_idx`),
         table: TABLE_SPANS,
         columns: ['metadata'],
         method: 'gin',
       },
       // Tags array GIN index - for array containment queries
       {
-        name: `${schemaPrefix}mastra_ai_spans_tags_gin_idx`,
+        name: defaultIndexName(`${schemaPrefix}mastra_ai_spans_tags_gin_idx`),
         table: TABLE_SPANS,
         columns: ['tags'],
         method: 'gin',

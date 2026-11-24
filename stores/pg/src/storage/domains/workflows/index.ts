@@ -62,7 +62,7 @@ import type { StepResult, WorkflowRunState, WorkflowRunStatus } from '@mastra/co
 import { schemaNamePrefix } from '../../../shared/schema-name';
 import { PgDB, resolvePgConfig, generateTableSQL, generateIndexSQL } from '../../db';
 import type { PgDomainConfig } from '../../db';
-import { buildConstraintName } from '../../db/constraint-utils';
+import { buildConstraintName, defaultIndexName } from '../../db/constraint-utils';
 import { assertRunFence, DB_NOW_MS, withRunFence } from '../../db/run-fencing';
 import type { Queryable } from '../../db/run-fencing';
 import { toPgJson } from '../../db/sanitize-json';
@@ -466,7 +466,7 @@ export class WorkflowsPG extends WorkflowsStorage {
   static getDefaultIndexDefs(schemaPrefix: string): CreateIndexOptions[] {
     return [
       {
-        name: `${schemaPrefix}mastra_workflow_snapshot_name_createdat_idx`,
+        name: defaultIndexName(`${schemaPrefix}mastra_workflow_snapshot_name_createdat_idx`),
         table: TABLE_WORKFLOW_SNAPSHOT,
         columns: ['workflow_name', 'createdAt DESC'],
       },

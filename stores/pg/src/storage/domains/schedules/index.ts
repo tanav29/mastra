@@ -23,6 +23,7 @@ import {
 import { parseSchemaName, schemaNamePrefix } from '../../../shared/schema-name';
 import type { DbClient } from '../../client';
 import { PgDB, resolvePgConfig, generateTableSQL, generateIndexSQL } from '../../db';
+import { defaultIndexName } from '../../db/constraint-utils';
 import type { PgDomainConfig } from '../../db';
 import { toPgJson } from '../../db/sanitize-json';
 import { resolveTargets, runPrune } from '../../retention';
@@ -193,12 +194,12 @@ export class SchedulesPG extends SchedulesStorage {
   static getDefaultIndexDefs(schemaPrefix: string): CreateIndexOptions[] {
     return [
       {
-        name: `${schemaPrefix}idx_mastra_schedules_status_next_fire`,
+        name: defaultIndexName(`${schemaPrefix}idx_mastra_schedules_status_next_fire`),
         table: TABLE_SCHEDULES,
         columns: ['status', 'next_fire_at'],
       },
       {
-        name: `${schemaPrefix}idx_mastra_schedule_triggers_schedule_fire`,
+        name: defaultIndexName(`${schemaPrefix}idx_mastra_schedule_triggers_schedule_fire`),
         table: TABLE_SCHEDULE_TRIGGERS,
         columns: ['schedule_id', 'actual_fire_at DESC'],
       },

@@ -66,3 +66,10 @@ export function buildConstraintName({
   }
   return truncateIdentifier(fullName, maxLength);
 }
+
+/** Keep existing quoted index names intact when they fit in PostgreSQL's identifier budget. */
+export function defaultIndexName(name: string): string {
+  return Buffer.byteLength(name) <= POSTGRES_IDENTIFIER_MAX_LENGTH
+    ? name
+    : buildConstraintName({ baseName: name, hashWhenTruncated: true });
+}
