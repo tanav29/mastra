@@ -22,6 +22,7 @@ import {
 } from '@mastra/core/storage';
 import { schemaNamePrefix } from '../../../shared/schema-name';
 import { PgDB, resolvePgConfig, generateTableSQL, generateIndexSQL } from '../../db';
+import { defaultIndexName } from '../../db/constraint-utils';
 import type { PgDomainConfig } from '../../db';
 import { toPgJson } from '../../db/sanitize-json';
 import { runPrune, resolveTargets } from '../../retention';
@@ -141,7 +142,7 @@ export class ScoresPG extends ScoresStorage {
   static getDefaultIndexDefs(schemaPrefix: string): CreateIndexOptions[] {
     return [
       {
-        name: `${schemaPrefix}mastra_scores_trace_id_span_id_created_at_idx`,
+        name: defaultIndexName(`${schemaPrefix}mastra_scores_trace_id_span_id_created_at_idx`),
         table: TABLE_SCORERS,
         columns: ['traceId', 'spanId', 'createdAt DESC'],
       },

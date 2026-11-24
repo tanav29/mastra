@@ -8,6 +8,7 @@ import type { CreateIndexOptions, ChannelInstallation, ChannelConfig } from '@ma
 
 import { schemaNamePrefix } from '../../../shared/schema-name';
 import { PgDB, resolvePgConfig, generateTableSQL, generateIndexSQL } from '../../db';
+import { defaultIndexName } from '../../db/constraint-utils';
 import type { PgDomainConfig } from '../../db';
 import { toPgJson } from '../../db/sanitize-json';
 import { getTableName, getSchemaName } from '../utils';
@@ -45,13 +46,13 @@ export class ChannelsPG extends ChannelsStorage {
   static getDefaultIndexDefs(schemaPrefix: string): CreateIndexOptions[] {
     return [
       {
-        name: `${schemaPrefix}idx_channel_installations_webhook`,
+        name: defaultIndexName(`${schemaPrefix}idx_channel_installations_webhook`),
         table: TABLE_CHANNEL_INSTALLATIONS,
         columns: ['webhookId'],
         unique: true,
       },
       {
-        name: `${schemaPrefix}idx_channel_installations_platform_agent`,
+        name: defaultIndexName(`${schemaPrefix}idx_channel_installations_platform_agent`),
         table: TABLE_CHANNEL_INSTALLATIONS,
         columns: ['platform', 'agentId'],
       },

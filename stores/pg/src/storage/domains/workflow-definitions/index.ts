@@ -10,6 +10,7 @@ import type {
 
 import { schemaNamePrefix } from '../../../shared/schema-name';
 import { PgDB, resolvePgConfig, generateTableSQL } from '../../db';
+import { defaultIndexName } from '../../db/constraint-utils';
 import type { DbClient, PgDomainConfig } from '../../db';
 import { getSchemaName, getTableName, parseJsonResilient } from '../utils';
 
@@ -79,7 +80,7 @@ export class WorkflowDefinitionsPG extends WorkflowDefinitionsStorage {
     const schemaPrefix = this.#schema !== 'public' ? `${schemaNamePrefix(this.#schema)}_` : '';
     return [
       {
-        name: `${schemaPrefix}idx_workflow_definitions_status`,
+        name: defaultIndexName(`${schemaPrefix}idx_workflow_definitions_status`),
         table: TABLE_WORKFLOW_DEFINITIONS,
         columns: ['status'],
       },

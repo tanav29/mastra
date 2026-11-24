@@ -24,6 +24,7 @@ import type {
 } from '@mastra/core/storage/domains/mcp-clients';
 import { schemaNamePrefix } from '../../../shared/schema-name';
 import { PgDB, resolvePgConfig, generateTableSQL, generateIndexSQL } from '../../db';
+import { defaultIndexName } from '../../db/constraint-utils';
 import type { DbClient, PgDomainConfig } from '../../db';
 import { toPgJson } from '../../db/sanitize-json';
 import { getTableName, getSchemaName, parseJsonResilient } from '../utils';
@@ -50,7 +51,7 @@ export class MCPClientsPG extends MCPClientsStorage {
   static getDefaultIndexDefs(schemaPrefix: string): CreateIndexOptions[] {
     return [
       {
-        name: `${schemaPrefix}idx_mcp_client_versions_client_version`,
+        name: defaultIndexName(`${schemaPrefix}idx_mcp_client_versions_client_version`),
         table: TABLE_MCP_CLIENT_VERSIONS,
         columns: ['mcpClientId', 'versionNumber'],
         unique: true,

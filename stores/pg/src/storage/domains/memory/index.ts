@@ -131,6 +131,7 @@ import {
   getTableName as dbGetTableName,
 } from '../../db';
 import type { PgDomainConfig } from '../../db';
+import { defaultIndexName } from '../../db/constraint-utils';
 import { assertRunFence, DB_NOW_MS, withRunFence } from '../../db/run-fencing';
 import type { Queryable } from '../../db/run-fencing';
 import { toPgJson } from '../../db/sanitize-json';
@@ -344,20 +345,20 @@ export class MemoryPG extends MemoryStorage {
   static getDefaultIndexDefs(schemaPrefix: string): CreateIndexOptions[] {
     return [
       {
-        name: `${schemaPrefix}mastra_threads_resourceid_createdat_idx`,
+        name: defaultIndexName(`${schemaPrefix}mastra_threads_resourceid_createdat_idx`),
         table: TABLE_THREADS,
         columns: ['resourceId', 'createdAt DESC'],
       },
       // listThreads filters and counts by metadata containment (@>); without this every call scans the table.
       {
-        name: `${schemaPrefix}mastra_threads_metadata_gin_idx`,
+        name: defaultIndexName(`${schemaPrefix}mastra_threads_metadata_gin_idx`),
         table: TABLE_THREADS,
         columns: ['metadata'],
         method: 'gin',
         opclass: 'jsonb_path_ops',
       },
       {
-        name: `${schemaPrefix}mastra_messages_thread_id_createdat_idx`,
+        name: defaultIndexName(`${schemaPrefix}mastra_messages_thread_id_createdat_idx`),
         table: TABLE_MESSAGES,
         columns: ['thread_id', 'createdAt DESC'],
       },

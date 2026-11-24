@@ -17,6 +17,7 @@ import type {
 import { BackgroundTasksStorage, TABLE_BACKGROUND_TASKS, TABLE_SCHEMAS } from '@mastra/core/storage';
 import { schemaNamePrefix } from '../../../shared/schema-name';
 import { PgDB, resolvePgConfig, generateTableSQL, generateIndexSQL } from '../../db';
+import { defaultIndexName } from '../../db/constraint-utils';
 import type { PgDomainConfig } from '../../db';
 import { toPgJson } from '../../db/sanitize-json';
 import { runPrune, resolveTargets } from '../../retention';
@@ -172,22 +173,22 @@ export class BackgroundTasksPG extends BackgroundTasksStorage {
   static getDefaultIndexDefs(schemaPrefix: string): CreateIndexOptions[] {
     return [
       {
-        name: `${schemaPrefix}mastra_bg_tasks_status_created_at_idx`,
+        name: defaultIndexName(`${schemaPrefix}mastra_bg_tasks_status_created_at_idx`),
         table: TABLE_BACKGROUND_TASKS,
         columns: ['status', 'createdAt'],
       },
       {
-        name: `${schemaPrefix}mastra_bg_tasks_agent_status_idx`,
+        name: defaultIndexName(`${schemaPrefix}mastra_bg_tasks_agent_status_idx`),
         table: TABLE_BACKGROUND_TASKS,
         columns: ['agent_id', 'status'],
       },
       {
-        name: `${schemaPrefix}mastra_bg_tasks_thread_idx`,
+        name: defaultIndexName(`${schemaPrefix}mastra_bg_tasks_thread_idx`),
         table: TABLE_BACKGROUND_TASKS,
         columns: ['thread_id', 'createdAt'],
       },
       {
-        name: `${schemaPrefix}mastra_bg_tasks_tool_call_idx`,
+        name: defaultIndexName(`${schemaPrefix}mastra_bg_tasks_tool_call_idx`),
         table: TABLE_BACKGROUND_TASKS,
         columns: ['tool_call_id'],
       },
