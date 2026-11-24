@@ -455,6 +455,27 @@ const pgIndexExists = async (store: PostgresStore, namePattern: string): Promise
   return result?.exists === true;
 };
 
+it('creates the scores and memory indexes when a schema prefix overflows their generated names', async () => {
+  const schemaName = 'customer_workspace_production';
+  const store = new PostgresStore({ ...TEST_CONFIG, schemaName });
+  try {
+    await store.init();
+    const indexes = [
+      ...ScoresPG.getDefaultIndexDefs(schemaName + '_'),
+      ...MemoryPG.getDefaultIndexDefs(schemaName + '_'),
+    ];
+    for (const index of indexes) {
+      const found = await store.db.oneOrNone(
+        'SELECT indexname FROM pg_indexes WHERE schemaname = $1 AND indexname = $2',
+        [schemaName, index.name],
+      );
+      expect(found).toEqual({ indexname: index.name });
+    }
+  } finally {
+    await store.close();
+  }
+});
+
 // Store-level index configuration tests
 // Uses unique schema names to avoid index collision between tests
 const storeTestId = Math.floor(Date.now() / 1000) % 100000; // Short unique ID

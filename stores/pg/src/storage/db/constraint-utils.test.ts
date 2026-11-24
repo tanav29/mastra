@@ -1,9 +1,9 @@
 import { TABLE_WORKFLOW_SNAPSHOT, TABLE_SCHEMAS } from '@mastra/core/storage';
 import { describe, it, expect } from 'vitest';
 
-import { POSTGRES_IDENTIFIER_MAX_LENGTH, truncateIdentifier, buildConstraintName } from './constraint-utils';
-import { ScoresPG } from '../domains/scores';
 import { MemoryPG } from '../domains/memory';
+import { ScoresPG } from '../domains/scores';
+import { POSTGRES_IDENTIFIER_MAX_LENGTH, truncateIdentifier, buildConstraintName } from './constraint-utils';
 import { generateTableSQL } from './index';
 
 it('generates distinct default indexes for a long schema and preserves existing mixed-case names', () => {
@@ -11,7 +11,9 @@ it('generates distinct default indexes for a long schema and preserves existing 
   const names = [...ScoresPG.getDefaultIndexDefs(prefix), ...MemoryPG.getDefaultIndexDefs(prefix)].map(idx => idx.name);
   expect(names.every(name => Buffer.byteLength(name) <= POSTGRES_IDENTIFIER_MAX_LENGTH)).toBe(true);
   expect(new Set(names).size).toBe(names.length);
-  expect(ScoresPG.getDefaultIndexDefs('MySchema_')[0]?.name).toBe('MySchema_mastra_scores_trace_id_span_id_created_at_idx');
+  expect(ScoresPG.getDefaultIndexDefs('MySchema_')[0]?.name).toBe(
+    'MySchema_mastra_scores_trace_id_span_id_created_at_idx',
+  );
 });
 
 // ---------------------------------------------------------------------------
