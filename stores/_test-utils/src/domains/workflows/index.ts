@@ -743,6 +743,9 @@ export function createWorkflowsTests({ storage, workflowResultsNoopWhenRunMissin
       expect(run?.snapshot).toEqual(snapshot);
       expect(run?.workflowName).toBe(workflowName);
       expect(run?.runId).toBe(runId);
+      expect(await workflowsStorage.loadWorkflowSnapshot({ workflowName, runId })).toEqual(snapshot);
+      await workflowsStorage.deleteWorkflowRunById({ workflowName, runId });
+      expect(await workflowsStorage.getWorkflowRunById({ workflowName, runId })).toBeNull();
     });
 
     it('should apply an update when the expectedStatus guard matches', async () => {
