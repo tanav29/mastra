@@ -23,6 +23,8 @@ import { withSpanPreviews } from './span-previews';
 export type { PlatformByteBatchingConfig, PlatformByteBatchingStats } from './platform-byte-batcher';
 
 export interface MastraPlatformExporterConfig extends BaseExporterConfig {
+  /** Include repeated conversation history in processor span inputs. Defaults to false. */
+  includeProcessorHistory?: boolean;
   maxBatchSize?: number; // Default: 1000 spans
   maxBatchWaitMs?: number; // Default: 5000ms
   maxRetries?: number; // Collector batch retries. Default: 3
@@ -295,9 +297,11 @@ export class MastraPlatformExporter extends BaseExporter {
   private shuttingDown = false;
   private byteBatcher?: PlatformByteBatcher<PlatformSignal>;
   private byteUploadTimeoutMs?: number;
+  private readonly includeProcessorHistory: boolean;
 
   constructor(config: MastraPlatformExporterConfig = {}) {
     super(config);
+    this.includeProcessorHistory = config.includeProcessorHistory ?? false;
 
     if (config.projectId !== undefined && !VALID_PROJECT_ID.test(config.projectId)) {
       throw createInvalidProjectIdError(config.projectId);
@@ -625,6 +629,22 @@ export class MastraPlatformExporter extends BaseExporter {
       updatedAt: null,
     };
 
+    const attributes = span.attributes;
+    if (
+      !this.includeProcessorHistory &&
+      attributes &&
+      'processorPhase' in attributes &&
+      span.input &&
+      typeof span.input === 'object' &&
+      !Array.isArray(span.input)
+    ) {
+      // Build previews from the complete input before removing the repeated history from the wire copy.
+      const input = { ...span.input };
+      delete input.messages;
+      delete input.systemMessages;
+      if (attributes.processorPhase === 'llmRequest') delete input.prompt;
+      spanRecord.input = input;
+    }
     return spanRecord;
   }
 

@@ -688,6 +688,32 @@ describe('Platform uploads over HTTP', () => {
     expect(receiver.bodies[0]!.data.logs![0].message).toBe('before');
   });
 
+  it.each([false, true])('uploads repeated processor history only when requested (include=%s)', async include => {
+    const receiver = await collector();
+    const instance = exporter(receiver.endpoint, include ? { includeProcessorHistory: true } : {});
+    const messages = [{ role: 'user', content: 'previous turn'.repeat(1000) }];
+    await instance.onTracingEvent({
+      type: 'span_ended',
+      exportedSpan: {
+        id: 'child',
+        traceId: 'trace',
+        name: 'recall',
+        type: SpanType.MEMORY_OPERATION,
+        startTime: new Date(),
+        endTime: new Date(),
+        isEvent: false,
+        isRootSpan: false,
+        attributes: { processorPhase: 'inputStep' },
+        input: { messages, stepNumber: 3 },
+        output: { changed: true },
+      },
+    } as TracingEvent);
+    await instance.flush();
+    const [span] = receiver.bodies[0]!.data.spans;
+    expect(span.input).toEqual(include ? { messages, stepNumber: 3 } : { stepNumber: 3 });
+    expect(span.output).toEqual({ changed: true });
+  });
+
   it('routes all five signals and drains partial batches on shutdown', async () => {
     const receiver = await collector();
     const instance = exporter(receiver.endpoint);
