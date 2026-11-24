@@ -541,12 +541,14 @@ export class E2BSandbox extends MastraSandbox<Sandbox> {
    */
   async stop(): Promise<void> {
     // Unmount all filesystems before pausing
-    // Collect keys first since unmount() mutates the map
-    for (const mountPath of [...this.mounts.entries.keys()]) {
+    // Unmount removes the registration; keep the filesystem for the next start.
+    for (const [mountPath, entry] of [...this.mounts.entries]) {
       try {
         await this.unmount(mountPath);
       } catch {
         // Best-effort unmount; sandbox may already be dead
+      } finally {
+        this.mounts.set(mountPath, { filesystem: entry.filesystem, state: 'pending', error: undefined });
       }
     }
 

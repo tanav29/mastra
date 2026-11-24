@@ -887,8 +887,7 @@ describe.skipIf(!process.env.E2B_API_KEY || !hasS3Credentials)('E2BSandbox Stop/
     expect(mountsBefore.stdout).toContain('/data/mount1');
     expect(mountsBefore.stdout).toContain('/data/mount2');
 
-    // Stop should unmount all
-    await sandbox.stop();
+    await sandbox._stop();
 
     // Reconnect to verify mounts are gone
     const sandbox2 = new E2BSandbox({ id: sandbox.id, timeout: 60000 });
@@ -903,7 +902,16 @@ describe.skipIf(!process.env.E2B_API_KEY || !hasS3Credentials)('E2BSandbox Stop/
     expect(hasFuseMount1).toBe(false);
     expect(hasFuseMount2).toBe(false);
 
-    await sandbox2._destroy();
+    await sandbox2._stop();
+    await sandbox._start();
+    try {
+      const resumed = await sandbox.executeCommand('mount');
+      for (const path of ['/data/mount1', '/data/mount2']) {
+        expect(resumed.stdout.split('\n').some(line => line.includes(path) && line.includes('fuse'))).toBe(true);
+      }
+    } finally {
+      await sandbox._destroy();
+    }
   }, 300000);
 });
 
